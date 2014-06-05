@@ -56,7 +56,7 @@ class ValidatorRequestHandler(StreamRequestHandler):
             k = str(pow(remote_k, local_exponent) % n).rjust(8, '0')
             print('Done, private shared key: {}\n=======================\n'.format(k))
 
-            file = os.open("tmp\\" + self.client_address[0], os.O_CREAT | os.O_TRUNC | os.O_RDWR)
+            file = os.open("src\\server\\tmp\\" + self.client_address[0], os.O_CREAT | os.O_TRUNC | os.O_RDWR)
             os.write(file, b'\x00'*8)
 
             memory_file = mmap.mmap(file, 8)
@@ -66,7 +66,7 @@ class ValidatorRequestHandler(StreamRequestHandler):
         elif req == 'ci':
             print('Receiving image')
 
-            key_path = '..\\..\\key\\ness_public.pem' #+ input("Enter the sender's public key path")
+            key_path = 'key\\' + input("Enter the sender's public key name: ")
             key_file = open(key_path, 'rb')
             key = RSA.importKey(key_file.read())
             signer = Signature.new(key)
@@ -82,14 +82,14 @@ class ValidatorRequestHandler(StreamRequestHandler):
             padding = int.from_bytes(raw_padding, 'little')
 
             # Writing the ciphered image to a file
-            file = open('cipher.bmp', 'wb')
+            file = open('src\\server\\cipher.bmp', 'wb')
             file.write(raw_image)
             file.close()
 
-            image = BMP('cipher.bmp')
+            image = BMP('src\\server\\cipher.bmp')
             ciphertext = image.pixels
 
-            fd = os.open("tmp\\" + self.client_address[0], os.O_RDONLY, mode=0o555)
+            fd = os.open("src\\server\\tmp\\" + self.client_address[0], os.O_RDONLY, mode=0o555)
             des_key = os.read(fd, 8)
             decipher = DES.new(des_key, DES.MODE_CBC, b'12345678')
 
@@ -104,10 +104,9 @@ class ValidatorRequestHandler(StreamRequestHandler):
 
             if signer.verify(hash, signature):
                 print('Image signature validated, writing\n====================\n')
-                BMP.create_image(image, 'plain.bmp')
+                BMP.create_image(image, 'src\\server\\plain.bmp')
             else:
                 print('Image signature invalid\n==============================\n')
-                BMP.create_image(image, 'plain.bmp')
 
         self.finish()
 

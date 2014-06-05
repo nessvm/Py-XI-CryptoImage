@@ -1,6 +1,6 @@
 import socket
 
-from cryptographic import diffie_hellman
+from modules.cryptographic import diffie_hellman
 from modules.bmp import BMP
 from modules.data_stream import send_msg
 from Crypto.PublicKey import RSA
@@ -14,9 +14,9 @@ __author__ = 'Ness'
 def main():
     # Argument validations
     # Arguments must include flags:
-    server_address = '127.0.0.1'#input("Enter server address: ")
-    image_path = '..\\..\\img\\' + 'Paisaje.bmp'#input("Enter image name: ")
-    local_key_path = '..\\..\\key\\' + 'ness_private.pem'#input("Enter your private key name: ")
+    server_address = input("Enter server address: ")
+    image_path = 'img\\' + input("Enter image name: ")
+    local_key_path = 'key\\' + input("Enter your private key name: ")
 
     # Image instance
     image = BMP(image_path)
@@ -48,10 +48,6 @@ def main():
 
     image_bytes = image.get_bytes()
     signature = signer.sign(hash)
-
-    ct_size = len(image_bytes)
-    print(len(image_bytes))
-    sig_size = len(signature)
 
     # Creating the connection with the server and sending
     connection = socket.socket()
